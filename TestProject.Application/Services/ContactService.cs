@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TestProject.Domain;
 using TestProject.Domain.Models;
 using TestProject.Domain.Repositories;
 
-namespace TestProject.Application
+namespace TestProject.Application.Services
 {
     public class ContactService
     {
@@ -18,15 +19,17 @@ namespace TestProject.Application
             _repository = repository;
         }
 
-        public async Task<bool> CreateContact(Contact contact)
+        public async Task<OperationResponse> CreateContact(Contact contact)
         {
             if ((await _repository.FindContactByEmail(contact.Email)) is null)
             {
                 await _repository.AddContact(contact);
                 await _repository.Commit();
+
+                return new(OperationResult.Success);
             }
 
-            return false;
+            return new(OperationResult.Failure, "Specified email address already exists.");
         }
     }
 }

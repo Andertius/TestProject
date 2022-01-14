@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TestProject.Domain;
 using TestProject.Domain.Models;
 using TestProject.Domain.Repositories;
 
-namespace TestProject.Application
+namespace TestProject.Application.Services
 {
     public class AccountService
     {
@@ -20,19 +21,25 @@ namespace TestProject.Application
             _contactRepository = contactRepo;
         }
 
-        public async Task<bool> CreateAccount(Account account, string email)
+        public async Task<OperationResponse> CreateAccount(Account account, string email)
         {
             var contact = await _contactRepository.FindContactByEmail(email);
 
             if (contact is not null)
             {
-                account.Contact = contact;
-                await _accountRepository.AddAccount(account);
-                await _accountRepository.Commit();
-                return true;
+                if ((await _accountRepository.FindAccountByName(account.Name)) is null)
+                {
+                    account.Contact = contact;
+                    await _accountRepository.AddAccount(account);
+                    await _accountRepository.Commit();
+
+                    return new(OperationResult.Success, "");
+                }
+
+                return new(OperationResult.Failure, "Account with specified name already exists.");
             }
 
-            return false;
+            return new(OperationResult.NotFound, "Specified email is not registered.");
         }
     }
 }

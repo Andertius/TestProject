@@ -1,4 +1,4 @@
-﻿namespace TestProject.Requests
+﻿namespace TestProject.Domain.Requests
 {
     public class IncidentRequest
     {

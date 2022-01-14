@@ -18,9 +18,9 @@ namespace TestProject.DataAccess.Repositories
             _context = context;
         }
 
-        public Task AddIncident(Incident incident)
+        public async Task AddIncident(Incident incident)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync(incident);
         }
 
         public async Task Commit()

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 
-using TestProject.Application;
+using TestProject.Application.Services;
+using TestProject.Application.Validators;
+using TestProject.Domain;
 using TestProject.Domain.Models;
-using TestProject.Requests;
+using TestProject.Domain.Requests;
 
 namespace TestProject.Controllers
 {
@@ -24,36 +26,83 @@ namespace TestProject.Controllers
         [HttpPost("contacts/create")]
         public async Task<IActionResult> CreateContact([FromBody] ContactRequest request)
         {
-            await _contactService.CreateContact(new Contact
+            var validator = new ContactRequestValidator();
+
+            if (!(await validator.ValidateAsync(request)).IsValid)
+            {
+                return BadRequest((await validator
+                    .ValidateAsync(request)).Errors
+                        .Select(x => x.ErrorMessage)
+                            .Aggregate((x, y) => $"{x}\n{y}"));
+            }
+
+            var contact = new Contact
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Email = request.Email,
-            });
+                Email = request.Email
+            };
 
-            return NoContent();
+            var response =  await _contactService.CreateContact(contact);
+
+            return response.Result switch
+            {
+                OperationResult.Failure => BadRequest(response.Error),
+                OperationResult.NotFound => NotFound(response.Error),
+                OperationResult.Success => NoContent(),
+                _ => throw new NotSupportedException(),
+            };
         }
 
         [HttpPost("accounts/create")]
         public async Task<IActionResult> CreateAccount([FromBody] AccountRequest request)
         {
-            var account = new Account { Name = request.Name };
-            if (await _accountService.CreateAccount(account, request.Email))
+            var validator = new AccountRequestValidator();
+
+            if (!(await validator.ValidateAsync(request)).IsValid)
             {
-                return NoContent();
+                return BadRequest((await validator
+                    .ValidateAsync(request)).Errors
+                        .Select(x => x.ErrorMessage)
+                            .Aggregate((x, y) => $"{x}\n{y}"));
             }
 
-            return BadRequest();
+            var account = new Account { Name = request.Name };
+            var response = await _accountService.CreateAccount(account, request.Email);
+
+            return response.Result switch
+            {
+                OperationResult.Failure => BadRequest(response.Error),
+                OperationResult.NotFound => NotFound(response.Error),
+                OperationResult.Success => NoContent(),
+                _ => throw new NotSupportedException(),
+            };
         }
 
         [HttpPost("incidents/create")]
         public async Task<IActionResult> CreateIncident([FromBody] IncidentRequest request)
         {
+            var validator = new IncidentRequestValidator();
+
+            if (!(await validator.ValidateAsync(request)).IsValid)
+            {
+                return BadRequest((await validator
+                    .ValidateAsync(request)).Errors
+                        .Select(x => x.ErrorMessage)
+                            .Aggregate((x, y) => $"{x}\n{y}"));
+            }
+
             var contact = new Contact { Email = request.Email, FirstName = request.FirstName, LastName = request.LastName };
             var incident = new Incident { Description = request.Description, Name = Guid.NewGuid().ToString() };
-            await _incidentService.CreateIncident(incident, request.AccountName, contact);
+            var response = await _incidentService.CreateIncident(incident, request.AccountName, contact);
 
-            return NoContent();
+            return response.Result switch
+            {
+                OperationResult.Failure => BadRequest(response.Error),
+                OperationResult.NotFound => NotFound(response.Error),
+                OperationResult.Success => NoContent(),
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }

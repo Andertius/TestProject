@@ -8,7 +8,7 @@ using TestProject.Domain;
 using TestProject.Domain.Models;
 using TestProject.Domain.Repositories;
 
-namespace TestProject.Application
+namespace TestProject.Application.Services
 {
     public class IncidentService
     {
@@ -23,7 +23,8 @@ namespace TestProject.Application
             _contactRepository = contactRepo;
         }
 
-        public async Task<bool> CreateIncident(Incident incident, string accountName, Contact contact)
+        //TODO fix
+        public async Task<OperationResponse> CreateIncident(Incident incident, string accountName, Contact contact)
         {
             var account = await _accountRepository.FindAccountByName(accountName);
 
@@ -48,11 +49,11 @@ namespace TestProject.Application
                     await _accountRepository .Commit();
                     await _contactRepository.Commit();
 
-                    return true;
+                    return new(OperationResult.Success);
                 }
             }
 
-            return false;
+            return new(OperationResult.NotFound, "Account with specified name does not exist.");
         }
     }
 }
