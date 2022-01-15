@@ -72,8 +72,7 @@ namespace TestProject.Controllers
                     .Aggregate((x, y) => $"{x}\n{y}"));
             }
 
-            var account = new Account { Name = request.Name };
-            var response = await _accountService.CreateAccount(account, request.Email);
+            var response = await _accountService.CreateAccount(request.Name, request.Email);
 
             return response.Result switch
             {

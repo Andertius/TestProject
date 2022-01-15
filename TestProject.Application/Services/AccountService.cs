@@ -15,14 +15,16 @@ namespace TestProject.Application.Services
             _contactRepository = contactRepo;
         }
 
-        public async Task<OperationResponse> CreateAccount(Account account, string email)
+        public async Task<OperationResponse> CreateAccount(string accountName, string email)
         {
             var contact = await _contactRepository.FindContactByEmail(email);
 
             if (contact is not null)
             {
-                if ((await _accountRepository.FindAccountByName(account.Name)) is null)
+                if ((await _accountRepository.FindAccountByName(accountName)) is null)
                 {
+                    var account = new Account { Name = accountName };
+
                     account.Contact = contact;
                     await _accountRepository.AddAccount(account);
                     await _accountRepository.Commit();
