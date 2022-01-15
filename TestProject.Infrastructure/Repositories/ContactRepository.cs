@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using TestProject.Application.Repositories;
 using TestProject.Domain.Models;
-using TestProject.Domain.Repositories;
 
 namespace TestProject.DataAccess.Repositories
 {

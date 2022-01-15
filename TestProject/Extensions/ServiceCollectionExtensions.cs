@@ -1,6 +1,6 @@
-﻿using TestProject.Application.Services;
+﻿using TestProject.Application.Repositories;
+using TestProject.Application.Services;
 using TestProject.DataAccess.Repositories;
-using TestProject.Domain.Repositories;
 
 namespace TestProject.Extensions
 {

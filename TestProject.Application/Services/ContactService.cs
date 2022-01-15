@@ -1,6 +1,6 @@
-﻿using TestProject.Domain;
+﻿using TestProject.Application.Repositories;
+using TestProject.Domain;
 using TestProject.Domain.Models;
-using TestProject.Domain.Repositories;
 
 namespace TestProject.Application.Services
 {

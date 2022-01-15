@@ -1,5 +1,5 @@
-﻿using TestProject.Domain.Models;
-using TestProject.Domain.Repositories;
+﻿using TestProject.Application.Repositories;
+using TestProject.Domain.Models;
 
 namespace TestProject.DataAccess.Repositories
 {

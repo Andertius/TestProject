@@ -1,6 +1,6 @@
 ﻿using TestProject.Domain.Models;
 
-namespace TestProject.Domain.Repositories
+namespace TestProject.Application.Repositories
 {
     public interface IAccountRepository
     {
