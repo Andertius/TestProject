@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using FluentValidation;
+﻿using FluentValidation;
 
 using TestProject.Domain.Requests;
 
@@ -15,7 +9,8 @@ namespace TestProject.Application.Validators
         public ContactRequestValidator()
         {
             RuleFor(x => x.Email)
-                .EmailAddress();
+                .EmailAddress()
+                .WithMessage(x => $"'{x.Email}' is not a valid email address.");
 
             RuleFor(x => x.FirstName)
                 .NotEmpty();

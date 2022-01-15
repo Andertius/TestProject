@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using TestProject.Domain;
+﻿using TestProject.Domain;
 using TestProject.Domain.Models;
 using TestProject.Domain.Repositories;
 
@@ -23,7 +17,6 @@ namespace TestProject.Application.Services
             _contactRepository = contactRepo;
         }
 
-        //TODO fix
         public async Task<OperationResponse> CreateIncident(Incident incident, string accountName, Contact contact)
         {
             var account = await _accountRepository.FindAccountByName(accountName);
@@ -34,23 +27,23 @@ namespace TestProject.Application.Services
 
                 if (dBContact is null)
                 {
+                    account.Contact = contact;
                     await _contactRepository.AddContact(contact);
                     dBContact = contact;
                 }
 
                 if (dBContact.FirstName == contact.FirstName && dBContact.LastName == contact.LastName)
                 {
-                    dBContact.Accounts.Add(account);
-
+                    incident.Account = account;
                     await _incidentRepository.AddIncident(incident);
-                    account.Incidents.Add(incident);
 
                     await _incidentRepository.Commit();
-                    await _accountRepository .Commit();
                     await _contactRepository.Commit();
 
                     return new(OperationResult.Success);
                 }
+
+                return new(OperationResult.Failure, "Contact information was incorrect.");
             }
 
             return new(OperationResult.NotFound, "Account with specified name does not exist.");

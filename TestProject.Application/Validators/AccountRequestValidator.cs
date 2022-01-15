@@ -9,7 +9,8 @@ namespace TestProject.Application.Validators
         public AccountRequestValidator()
         {
             RuleFor(x => x.Email)
-                .EmailAddress();
+                .EmailAddress()
+                .WithMessage(x => $"'{x.Email}' is not a valid email address.");
 
             RuleFor(x => x.Name)
                 .NotEmpty();

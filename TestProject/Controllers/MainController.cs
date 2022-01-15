@@ -16,7 +16,10 @@ namespace TestProject.Controllers
         private readonly AccountService _accountService;
         private readonly IncidentService _incidentService;
 
-        public MainController(IncidentService incidentService, ContactService contactService, AccountService accountService)
+        public MainController(
+            IncidentService incidentService,
+            ContactService contactService,
+            AccountService accountService)
         {
             _accountService = accountService;
             _contactService = contactService;
@@ -31,16 +34,17 @@ namespace TestProject.Controllers
             if (!(await validator.ValidateAsync(request)).IsValid)
             {
                 return BadRequest((await validator
-                    .ValidateAsync(request)).Errors
-                        .Select(x => x.ErrorMessage)
-                            .Aggregate((x, y) => $"{x}\n{y}"));
+                    .ValidateAsync(request))
+                    .Errors
+                    .Select(x => x.ErrorMessage)
+                    .Aggregate((x, y) => $"{x}\n{y}"));
             }
 
             var contact = new Contact
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Email = request.Email
+                Email = request.Email,
             };
 
             var response =  await _contactService.CreateContact(contact);
@@ -62,9 +66,10 @@ namespace TestProject.Controllers
             if (!(await validator.ValidateAsync(request)).IsValid)
             {
                 return BadRequest((await validator
-                    .ValidateAsync(request)).Errors
-                        .Select(x => x.ErrorMessage)
-                            .Aggregate((x, y) => $"{x}\n{y}"));
+                    .ValidateAsync(request))
+                    .Errors
+                    .Select(x => x.ErrorMessage)
+                    .Aggregate((x, y) => $"{x}\n{y}"));
             }
 
             var account = new Account { Name = request.Name };
@@ -87,9 +92,10 @@ namespace TestProject.Controllers
             if (!(await validator.ValidateAsync(request)).IsValid)
             {
                 return BadRequest((await validator
-                    .ValidateAsync(request)).Errors
-                        .Select(x => x.ErrorMessage)
-                            .Aggregate((x, y) => $"{x}\n{y}"));
+                    .ValidateAsync(request))
+                    .Errors
+                    .Select(x => x.ErrorMessage)
+                    .Aggregate((x, y) => $"{x}\n{y}"));
             }
 
             var contact = new Contact { Email = request.Email, FirstName = request.FirstName, LastName = request.LastName };
