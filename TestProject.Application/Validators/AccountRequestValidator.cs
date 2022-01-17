@@ -12,7 +12,7 @@ namespace TestProject.Application.Validators
                 .EmailAddress()
                 .WithMessage(x => $"'{x.Email}' is not a valid email address.");
 
-            RuleFor(x => x.Name)
+            RuleFor(x => x.AccountName)
                 .NotEmpty();
         }
     }

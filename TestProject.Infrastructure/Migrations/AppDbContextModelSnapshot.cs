@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TestProject.DataAccess;
+using TestProject.Infrastructure;
 
 #nullable disable
 
@@ -24,19 +24,21 @@ namespace TestProject.Infrastructure.Migrations
 
             modelBuilder.Entity("TestProject.Domain.Models.Account", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("ContactId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("IncidentName")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactId");
+                    b.HasIndex("IncidentName");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -47,9 +49,14 @@ namespace TestProject.Infrastructure.Migrations
 
             modelBuilder.Entity("TestProject.Domain.Models.Contact", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
@@ -61,6 +68,8 @@ namespace TestProject.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -74,47 +83,38 @@ namespace TestProject.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Name");
-
-                    b.HasIndex("AccountId");
 
                     b.ToTable("Incidents");
                 });
 
             modelBuilder.Entity("TestProject.Domain.Models.Account", b =>
                 {
-                    b.HasOne("TestProject.Domain.Models.Contact", "Contact")
+                    b.HasOne("TestProject.Domain.Models.Incident", "Incident")
                         .WithMany("Accounts")
-                        .HasForeignKey("ContactId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IncidentName");
 
-                    b.Navigation("Contact");
+                    b.Navigation("Incident");
                 });
 
-            modelBuilder.Entity("TestProject.Domain.Models.Incident", b =>
+            modelBuilder.Entity("TestProject.Domain.Models.Contact", b =>
                 {
                     b.HasOne("TestProject.Domain.Models.Account", "Account")
-                        .WithMany("Incidents")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Contacts")
+                        .HasForeignKey("AccountId");
 
                     b.Navigation("Account");
                 });
 
             modelBuilder.Entity("TestProject.Domain.Models.Account", b =>
                 {
-                    b.Navigation("Incidents");
+                    b.Navigation("Contacts");
                 });
 
-            modelBuilder.Entity("TestProject.Domain.Models.Contact", b =>
+            modelBuilder.Entity("TestProject.Domain.Models.Incident", b =>
                 {
                     b.Navigation("Accounts");
                 });

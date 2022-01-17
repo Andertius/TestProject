@@ -1,29 +1,39 @@
-﻿using TestProject.Application.Repositories;
-using TestProject.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+
 using TestProject.Domain.Models;
+using TestProject.Domain.Requests;
+using TestProject.Domain.Responses;
+using TestProject.Infrastructure;
 
 namespace TestProject.Application.Services
 {
     public class ContactService
     {
-        private readonly IContactRepository _repository;
+        private readonly AppDbContext _context;
 
-        public ContactService(IContactRepository repository)
+        public ContactService(AppDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
-        public async Task<OperationResponse> CreateContact(Contact contact)
+        public async Task<OperationResponse<Contact>> CreateContact(ContactRequest request)
         {
-            if ((await _repository.FindContactByEmail(contact.Email)) is null)
+            var contact = new Contact
             {
-                await _repository.AddContact(contact);
-                await _repository.Commit();
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+            };
 
-                return new(OperationResult.Success);
+            if ((await _context.Contacts.FirstOrDefaultAsync(x => x.Email == contact.Email)) is null)
+            {
+                await _context.Contacts.AddAsync(contact);
+                await _context.SaveChangesAsync();
+
+                return new(contact, OperationResult.Success);
             }
 
-            return new(OperationResult.Failure, "Specified email address already exists.");
+            return new(contact, OperationResult.Failure, "Specified email address already exists.");
         }
     }
 }

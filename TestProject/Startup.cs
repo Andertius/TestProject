@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using TestProject.DataAccess;
-using TestProject.Extensions;
+using Newtonsoft.Json;
+
+using TestProject.Application.Services;
+using TestProject.Infrastructure;
+using TestProject.Middlewares;
 
 namespace TestProject
 {
@@ -20,20 +23,29 @@ namespace TestProject
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            services.AddRepositories();
-            services.AddServices();
+            services
+                .AddScoped<AccountService>()
+                .AddScoped<ContactService>()
+                .AddScoped<IncidentService>();
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DbConnection")));
+
+            services.AddControllers()
+               .AddNewtonsoftJson(options =>
+                   options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 

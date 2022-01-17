@@ -2,7 +2,7 @@
 {
     public class Contact
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public string FirstName { get; set; }
 
@@ -11,6 +11,8 @@
         public string Email { get; set; }
 
 
-        public ICollection<Account> Accounts { get; set; }
+        public Account Account { get; set; }
+
+        public int? AccountId { get; set; }
     }
 }

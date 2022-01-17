@@ -2,15 +2,15 @@
 {
     public class Account
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
 
-        public Contact Contact { get; set; }
+        public Incident Incident { get; set; }
 
-        public Guid ContactId { get; set; }
+        public string IncidentName { get; set; }
 
-        public ICollection<Incident> Incidents { get; set; }
+        public ICollection<Contact> Contacts { get; set; }
     }
 }

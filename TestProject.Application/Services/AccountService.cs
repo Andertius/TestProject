@@ -1,41 +1,42 @@
-﻿using TestProject.Application.Repositories;
-using TestProject.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+
 using TestProject.Domain.Models;
+using TestProject.Domain.Requests;
+using TestProject.Domain.Responses;
+using TestProject.Infrastructure;
 
 namespace TestProject.Application.Services
 {
     public class AccountService
     {
-        private readonly IAccountRepository _accountRepository;
-        private readonly IContactRepository _contactRepository;
+        private readonly AppDbContext _context;
 
-        public AccountService(IAccountRepository accountRepo, IContactRepository contactRepo)
+        public AccountService(AppDbContext context)
         {
-            _accountRepository = accountRepo;
-            _contactRepository = contactRepo;
+            _context = context;
         }
 
-        public async Task<OperationResponse> CreateAccount(string accountName, string email)
+        public async Task<OperationResponse<Account>> CreateAccount(AccountRequest request)
         {
-            var contact = await _contactRepository.FindContactByEmail(email);
+            var contact = await _context.Contacts.FirstOrDefaultAsync(x => x.Email == request.Email);
 
             if (contact is not null)
             {
-                if ((await _accountRepository.FindAccountByName(accountName)) is null)
+                if ((await _context.Accounts.FirstOrDefaultAsync(x => x.Name == request.AccountName)) is null)
                 {
-                    var account = new Account { Name = accountName };
+                    var account = new Account { Name = request.AccountName };
 
-                    account.Contact = contact;
-                    await _accountRepository.AddAccount(account);
-                    await _accountRepository.Commit();
+                    await _context.Accounts.AddAsync(account);
+                    contact.Account = account;
+                    await _context.SaveChangesAsync();
 
-                    return new(OperationResult.Success, "");
+                    return new(account, OperationResult.Success, "");
                 }
 
-                return new(OperationResult.Failure, "Account with specified name already exists.");
+                return new(null, OperationResult.Failure, "Account with specified name already exists.");
             }
 
-            return new(OperationResult.NotFound, "Specified email is not registered.");
+            return new(null, OperationResult.NotFound, "Specified email is not registered.");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TestProject.Domain
+﻿namespace TestProject.Domain.Responses
 {
     public enum OperationResult
     {

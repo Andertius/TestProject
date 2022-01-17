@@ -2,7 +2,7 @@
 
 using TestProject.Domain.Models;
 
-namespace TestProject.DataAccess
+namespace TestProject.Infrastructure
 {
     public class AppDbContext : DbContext
     {
@@ -21,8 +21,9 @@ namespace TestProject.DataAccess
         {
             modelBuilder
                 .Entity<Incident>()
-                .HasOne(x => x.Account)
-                .WithMany(x => x.Incidents);
+                .HasMany(x => x.Accounts)
+                .WithOne(x => x.Incident)
+                .HasForeignKey(x => x.IncidentName);
 
             modelBuilder
                 .Entity<Incident>()
@@ -30,8 +31,8 @@ namespace TestProject.DataAccess
 
             modelBuilder
                 .Entity<Account>()
-                .HasOne(x => x.Contact)
-                .WithMany(x => x.Accounts);
+                .HasMany(x => x.Contacts)
+                .WithOne(x => x.Account);
 
             modelBuilder
                 .Entity<Account>()

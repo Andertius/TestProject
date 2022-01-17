@@ -7,8 +7,6 @@
         public string Description { get; set; }
 
 
-        public Guid AccountId { get; set; }
-
-        public Account Account { get; set; }
+        public ICollection<Account> Accounts { get; set; }
     }
 }
